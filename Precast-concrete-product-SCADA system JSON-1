@@ -1,0 +1,1426 @@
+[
+    {
+        "id": "data_simulator",
+        "type": "inject",
+        "z": "main_flow_tab",
+        "name": "数据模拟器",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "2",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "true",
+        "payloadType": "bool",
+        "x": 250,
+        "y": 240,
+        "wires": [
+            [
+                "data_generator"
+            ]
+        ]
+    },
+    {
+        "id": "data_generator",
+        "type": "function",
+        "z": "main_flow_tab",
+        "name": "生产数据生成器",
+        "func": "// 生产模块状态定义\nconst modules = [\n    { name: \"混凝土制备\", status: \"运行\", progress: 0, color: \"green\" },\n    { name: \"模具组装\", status: \"运行\", progress: 0, color: \"yellow\" },\n    { name: \"钢筋网片安装\", status: \"运行\", progress: 0, color: \"green\" },\n    { name: \"混凝土浇筑\", status: \"运行\", progress: 0, color: \"red\" },\n    { name: \"养护\", status: \"运行\", progress: 0, color: \"green\" },\n    { name: \"脱模与起吊\", status: \"运行\", progress: 0, color: \"green\" },\n    { name: \"成品质检\", status: \"运行\", progress: 0, color: \"green\" },\n    { name: \"入库管理\", status: \"运行\", progress: 0, color: \"green\" }\n];\n\n// 获取或初始化全局数据\nlet globalData = global.get(\"productionData\") || {\n    dailyTarget: 200,\n    dailyCompleted: 0,\n    currentHourProduced: 0,\n    modules: JSON.parse(JSON.stringify(modules)),  // 深拷贝避免引用同一个对象\n    alarms: [],\n    timestamp: Date.now()\n};\n\n// 模拟进度更新\nfor (let i = 0; i < globalData.modules.length; i++) {\n    let module = globalData.modules[i];\n    if (module.status === \"运行\") {\n        module.progress += Math.random() * 5;\n        if (module.progress > 100) {\n            module.progress = Math.random() * 20; // 重新开始新的生产周期\n            if (i === 0) { // 混凝土制备完成，增加产量\n                globalData.currentHourProduced += 1;\n                globalData.dailyCompleted += 1;\n            }\n        }\n    } else if (module.status === \"待料\") {\n        module.progress = 0;\n    } else if (module.status === \"故障\") {\n        module.progress = Math.max(0, module.progress - 1);\n    }\n}\n\nif (globalData.dailyCompleted >= globalData.dailyTarget) {\n    // 重置\n    globalData.dailyCompleted = 0;\n    globalData.currentHourProduced = 0;\n    globalData.alarms = [];\n    node.warn(\"日生产目标已达，已完成数量已重置为0\");\n}\n\n// 模拟报警\nif (Math.random() < 0.1) { // 10%概率产生新报警\n    const alarmTypes = [\n        \"温度超限报警\",\n        \"压力异常报警\",\n        \"料位低报警\",\n        \"设备故障报警\",\n        \"质量异常报警\"\n    ];\n    const priorities = [\"高\", \"中\", \"低\"];\n\n    globalData.alarms.push({\n        id: Date.now(),\n        type: alarmTypes[Math.floor(Math.random() * alarmTypes.length)],\n        priority: priorities[Math.floor(Math.random() * priorities.length)],\n        module: modules[Math.floor(Math.random() * modules.length)].name,\n        time: new Date().toLocaleTimeString()\n    });\n}\n\n// 限制报警数量\nif (globalData.alarms.length > 10) {\n    globalData.alarms = globalData.alarms.slice(-10);\n}\n\n// 更新时间戳\nglobalData.timestamp = Date.now();\n\n// ---- 扩展，整理模块状态文本，格式： 模块名 - 状态 - 进度%\nlet moduleTexts = globalData.modules.map(m => {\n    // 给进度保留1位小数，颜色信息可根据需求添加\n    return `${m.name} - ${m.status} - ${m.progress.toFixed(1)}%`;\n});\n\n// 整理报警文本，格式示例： 时间 [优先级] 报警类型 (模块)\nlet alarmTexts = globalData.alarms.map(a => {\n    return `${a.time} [${a.priority}] ${a.type} (${a.module})`;\n});\n\n// 保存更新后的数据\nglobal.set(\"productionData\", globalData);\n\n// 返回多路消息，可以拆分输出：\nreturn [\n    {\n        topic: \"stats\", payload: {\n            dailyTarget: globalData.dailyTarget,\n            dailyCompleted: globalData.dailyCompleted,\n            currentHourProduced: globalData.currentHourProduced,\n            completionRate: (globalData.dailyCompleted / globalData.dailyTarget * 100).toFixed(1),\n            timestamp: globalData.timestamp\n        }\n    },\n    { topic: \"modules\", payload: moduleTexts },\n    { topic: \"alarms\", payload: alarmTexts }\n];\n\n\n\n/*\n\n// 生产模块状态定义\nconst modules = [\n    {name: \"混凝土制备\", status: \"运行\", progress: 0, color: \"green\"},\n    {name: \"模具组装\", status: \"运行\", progress: 0, color: \"yellow\"},\n    {name: \"钢筋网片安装\", status: \"运行\", progress: 0, color: \"green\"},\n    {name: \"混凝土浇筑\", status: \"运行\", progress: 0, color: \"red\"},\n    {name: \"养护\", status: \"运行\", progress: 0, color: \"green\"},\n    {name: \"脱模与起吊\", status: \"运行\", progress: 0, color: \"green\"},\n    {name: \"成品质检\", status: \"运行\", progress: 0, color: \"green\"},\n    {name: \"入库管理\", status: \"运行\", progress: 0, color: \"green\"}\n];\n\n// 获取或初始化全局数据\nlet globalData = global.get(\"productionData\") || {\n    dailyTarget: 200,\n    dailyCompleted: 0,\n    currentHourProduced: 0,\n    modules: modules,\n    alarms: [],\n    timestamp: Date.now()\n};\n\n// 模拟进度更新\nfor(let i = 0; i < globalData.modules.length; i++) {\n    let module = globalData.modules[i];\n    if(module.status === \"运行\") {\n        module.progress += Math.random() * 5;\n        if(module.progress > 100) {\n            module.progress = Math.random() * 20; // 重新开始新的生产周期\n            if(i === 0) { // 混凝土制备完成，增加产量\n                globalData.currentHourProduced += 1;\n                globalData.dailyCompleted += 1;\n            }\n        }\n    } else if(module.status === \"待料\") {\n        module.progress = 0;\n    } else if(module.status === \"故障\") {\n        module.progress = Math.max(0, module.progress - 1);\n    }\n}\n\nif(globalData.dailyCompleted >= globalData.dailyTarget){\n    // 这里设置重置\n    globalData.dailyCompleted = 0;\n\n    // 如果需要，也可以重置 currentHourProduced 或其它变量\n    globalData.currentHourProduced = 0;\n\n    // 同时可以清空报警，或者做其它逻辑\n    globalData.alarms = [];\n\n    node.warn(\"日生产目标已达，已完成数量已重置为0\");\n}\n\n\n\n// 模拟报警\nif(Math.random() < 0.1) { // 10%概率产生新报警\n    const alarmTypes = [\n        \"温度超限报警\",\n        \"压力异常报警\", \n        \"料位低报警\",\n        \"设备故障报警\",\n        \"质量异常报警\"\n    ];\n    const priorities = [\"高\", \"中\", \"低\"];\n    \n    globalData.alarms.push({\n        id: Date.now(),\n        type: alarmTypes[Math.floor(Math.random() * alarmTypes.length)],\n        priority: priorities[Math.floor(Math.random() * priorities.length)],\n        module: modules[Math.floor(Math.random() * modules.length)].name,\n        time: new Date().toLocaleTimeString()\n    });\n}\n\n// 限制报警数量\nif(globalData.alarms.length > 10) {\n    globalData.alarms = globalData.alarms.slice(-10);\n}\n\n\n\n// 更新时间戳\nglobalData.timestamp = Date.now();\n\n// 保存全局数据\nglobal.set(\"productionData\", globalData);\n\n// 返回更新后的数据\nmsg.payload = globalData;\nreturn msg;\n\n*/",
+        "outputs": 3,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 560,
+        "y": 280,
+        "wires": [
+            [
+                "overview_distributor",
+                "module_data_distributor",
+                "20051ddd9e72c26e",
+                "8bd7d6c4dc0d4897",
+                "dd9c89f17ddc2f90",
+                "42dff8e64a5b31d1"
+            ],
+            [],
+            [
+                "83bb199f49935fac",
+                "64427adfc6a7cfca",
+                "438171a7dbb989fe",
+                "f4791849e38e1a8b",
+                "ad624104bcfc386b"
+            ]
+        ]
+    },
+    {
+        "id": "overview_distributor",
+        "type": "function",
+        "z": "main_flow_tab",
+        "d": true,
+        "name": "总览数据分发器",
+        "func": "const data = msg.payload;\n\n// 生产线状态模板\nconst statusTemplate = `\n<div style=\"display: flex; justify-content: space-around; margin: 20px 0; font-family: 'Microsoft YaHei', sans-serif;\">\n    <div style=\"text-align: center;\">\n        <div style=\"font-size: 24px; color: #4B7C95; margin-bottom: 5px;\">📊</div>\n        <div style=\"font-size: 14px; color: #666;\">今日目标</div>\n        <div style=\"font-size: 20px; font-weight: bold; color: #333;\">${data.dailyTarget}件</div>\n    </div>\n    <div style=\"text-align: center;\">\n        <div style=\"font-size: 24px; color: #4B7C95; margin-bottom: 5px;\">✅</div>\n        <div style=\"font-size: 14px; color: #666;\">已完成</div>\n        <div style=\"font-size: 20px; font-weight: bold; color: #28a745;\">${data.dailyCompleted}件</div>\n    </div>\n    <div style=\"text-align: center;\">\n        <div style=\"font-size: 24px; color: #4B7C95; margin-bottom: 5px;\">📈</div>\n        <div style=\"font-size: 14px; color: #666;\">完成率</div>\n        <div style=\"font-size: 20px; font-weight: bold; color: ${data.dailyCompleted/data.dailyTarget > 0.8 ? '#28a745' : '#ffc107'};\">${Math.round(data.dailyCompleted/data.dailyTarget*100)}%</div>\n    </div>\n    <div style=\"text-align: center;\">\n        <div style=\"font-size: 24px; color: #4B7C95; margin-bottom: 5px;\">🔔</div>\n        <div style=\"font-size: 14px; color: #666;\">活跃报警</div>\n        <div style=\"font-size: 20px; font-weight: bold; color: ${data.alarms.length > 5 ? '#dc3545' : '#28a745'};\">${data.alarms.length}条</div>\n    </div>\n</div>\n\n<div style=\"margin: 20px 0;\">\n    <h4 style=\"color: #4B7C95; margin-bottom: 15px;\">🏭 生产模块状态</h4>\n    <div style=\"display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px;\">\n        ${data.modules.map((module, index) => {\n            const statusColors = {\n                '运行': '#28a745',\n                '待料': '#ffc107', \n                '故障': '#dc3545',\n                '维护': '#6c757d'\n            };\n            const statusColor = statusColors[module.status] || '#6c757d';\n            const progressWidth = Math.round(module.progress);\n            \n            return `\n            <div style=\"\n                background: linear-gradient(145deg, #f8f9fa, #e9ecef);\n                border-radius: 12px;\n                padding: 15px;\n                box-shadow: 0 4px 6px rgba(0,0,0,0.1);\n                border-left: 4px solid ${statusColor};\n            \">\n                <div style=\"font-size: 12px; color: #666; margin-bottom: 5px;\">模块 ${index + 1}</div>\n                <div style=\"font-size: 14px; font-weight: bold; color: #333; margin-bottom: 8px;\">${module.name}</div>\n                <div style=\"\n                    display: inline-block;\n                    padding: 2px 8px;\n                    background: ${statusColor};\n                    color: white;\n                    border-radius: 12px;\n                    font-size: 11px;\n                    margin-bottom: 8px;\n                \">${module.status}</div>\n                <div style=\"\n                    background: #e9ecef;\n                    border-radius: 10px;\n                    height: 6px;\n                    overflow: hidden;\n                    margin-bottom: 5px;\n                \">\n                    <div style=\"\n                        background: ${statusColor};\n                        height: 100%;\n                        width: ${progressWidth}%;\n                        transition: width 0.3s ease;\n                    \"></div>\n                </div>\n                <div style=\"font-size: 10px; color: #666; text-align: right;\">${progressWidth}%</div>\n            </div>\n            `;\n        }).join('')}\n    </div>\n</div>\n`;\n\n\n// 发送状态模板\nnode.send([{payload: statusTemplate, topic: \"status_template\"}, null, null]);\n\n// 发送生产统计数据\n/*const statsData = {\n    labels: [\"目标\", \"完成\", \"剩余\"],\n    datasets: [{\n        data: [data.dailyTarget, data.dailyCompleted, Math.max(0, data.dailyTarget - data.dailyCompleted)],\n        backgroundColor: ['#4B7C95', '#28a745', '#e9ecef']\n    }]\n};\n*/\nconst statsData = [{\n    series: [\"数量\"],\n    data: [[data.dailyTarget, data.dailyCompleted, Math.max(0, data.dailyTarget - data.dailyCompleted)]],\n    labels: [\"目标\", \"完成\", \"剩余\"]\n}];\nnode.send([null, { payload: statsData, topic: \"production_chart\" }, null]);\n\n\n// 发送报警数据\nconst alarmHtml = `\n<div style=\"font-family: 'Microsoft YaHei', sans-serif;\">\n    ${data.alarms.length === 0 ? \n        '<div style=\"text-align: center; padding: 20px; color: #28a745;\">✅ 当前无活跃报警</div>' :\n        data.alarms.slice(-5).reverse().map(alarm => {\n            const priorityColors = {'高': '#dc3545', '中': '#ffc107', '低': '#17a2b8'};\n            const priorityColor = priorityColors[alarm.priority] || '#6c757d';\n            \n            return `\n            <div style=\"\n                margin-bottom: 10px;\n                padding: 12px;\n                border-radius: 8px;\n                border-left: 4px solid ${priorityColor};\n                background: #f8f9fa;\n            \">\n                <div style=\"display: flex; justify-content: between; align-items: center;\">\n                    <div>\n                        <div style=\"font-weight: bold; color: #333; margin-bottom: 2px;\">${alarm.type}</div>\n                        <div style=\"font-size: 12px; color: #666;\">${alarm.module} | ${alarm.time}</div>\n                    </div>\n                    <div style=\"\n                        background: ${priorityColor};\n                        color: white;\n                        padding: 2px 6px;\n                        border-radius: 4px;\n                        font-size: 10px;\n                        margin-left: 10px;\n                    \">${alarm.priority}</div>\n                </div>\n            </div>\n            `;\n        }).join('')\n    }\n</div>\n`;\n\nnode.send([null, null, {payload: alarmHtml, topic: \"alarm_list\"}]);\n\nreturn null;",
+        "outputs": 3,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1560,
+        "y": 280,
+        "wires": [
+            [
+                "b5e77968ad47801a"
+            ],
+            [
+                "production_chart"
+            ],
+            [
+                "alarm_display"
+            ]
+        ]
+    },
+    {
+        "id": "production_chart",
+        "type": "ui_chart",
+        "z": "main_flow_tab",
+        "d": true,
+        "name": "生产进度图表",
+        "group": "overview_group2",
+        "order": 1,
+        "width": "6",
+        "height": "4",
+        "label": "今日生产进度",
+        "chartType": "pie",
+        "legend": "true",
+        "xformat": "HH:mm:ss",
+        "interpolate": "linear",
+        "nodata": "暂无数据",
+        "dot": false,
+        "ymin": "",
+        "ymax": "",
+        "removeOlder": 1,
+        "removeOlderPoints": "",
+        "removeOlderUnit": "3600",
+        "cutout": 30,
+        "useOneColor": false,
+        "useUTC": false,
+        "colors": [
+            "#4b7c95",
+            "#28a745",
+            "#e9ecef",
+            "#ffc107",
+            "#dc3545",
+            "#17a2b8",
+            "#6c757d",
+            "#343a40",
+            "#f8f9fa"
+        ],
+        "outputs": 1,
+        "useDifferentColor": false,
+        "className": "",
+        "x": 1800,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "alarm_display",
+        "type": "ui_template",
+        "z": "main_flow_tab",
+        "d": true,
+        "group": "overview_group3",
+        "name": "报警信息显示",
+        "order": 1,
+        "width": "6",
+        "height": "4",
+        "format": "<div ng-if=\"msg.payload\" ng-bind-html=\"msg.payload\"></div>\n<div ng-if=\"!msg.payload\" style=\"color:#aaa;text-align:center;padding:20px;\">暂无报警数据</div>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1800,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "module_data_distributor",
+        "type": "function",
+        "z": "main_flow_tab",
+        "name": "模块数据分发器",
+        "func": "const data = msg.payload;\n\n// 为每个模块生成具体的模拟数据\nconst moduleData = {\n    // 模块1: 混凝土制备\n    module1: {\n        materials: {\n            cement: 85 + Math.random() * 10,\n            sand: 70 + Math.random() * 15,\n            gravel: 90 + Math.random() * 8,\n            water: 95 + Math.random() * 5,\n            additive: 60 + Math.random() * 20\n        },\n        mixer: {\n            speed: 45 + Math.random() * 10,\n            power: 75 + Math.random() * 15,\n            temperature: 25 + Math.random() * 5\n        },\n        quality: {\n            slump: 180 + Math.random() * 20,\n            strength: 28 + Math.random() * 2,\n            density: 2400 + Math.random() * 50\n        }\n    },\n    // 模块2: 模具组装\n    module2: {\n        molds: {\n            available: 45,\n            inUse: 12,\n            cleaning: 3,\n            maintenance: 2\n        },\n        assembly: {\n            position_accuracy: 98.5 + Math.random() * 1,\n            lock_status: Math.random() > 0.1 ? \"已锁紧\" : \"待锁紧\",\n            cleaning_pressure: 2.5 + Math.random() * 0.3\n        }\n    },\n    // 模块3: 钢筋网片安装  \n    module3: {\n        rebar: {\n            inventory: 156,\n            specifications: \"Φ12@200\",\n            position_x: 1250.5 + Math.random() * 2,\n            position_y: 800.2 + Math.random() * 2,\n            installation_force: 850 + Math.random() * 100\n        },\n        mesh: {\n            inventory: 89,\n            specifications: \"200x200x6\",\n            coverage: 95 + Math.random() * 4\n        }\n    },\n    // 模块4: 混凝土浇筑\n    module4: {\n        pouring: {\n            flow_rate: 15.5 + Math.random() * 3,\n            pressure: 1.8 + Math.random() * 0.2,\n            temperature: 23 + Math.random() * 3,\n            height: 450 + Math.random() * 50\n        },\n        vibration: {\n            frequency: 50 + Math.random() * 5,\n            amplitude: 0.8 + Math.random() * 0.2,\n            duration: 120 + Math.random() * 30\n        }\n    },\n    // 模块5: 养护\n    module5: {\n        chamber1: {\n            temperature: 65 + Math.random() * 5,\n            humidity: 85 + Math.random() * 10,\n            pressure: 1.05 + Math.random() * 0.1,\n            time_remaining: 420 - Math.random() * 60\n        },\n        chamber2: {\n            temperature: 70 + Math.random() * 5,\n            humidity: 90 + Math.random() * 8,\n            pressure: 1.08 + Math.random() * 0.1,\n            time_remaining: 180 - Math.random() * 30\n        }\n    },\n    // 模块6: 脱模与起吊\n    module6: {\n        demolding: {\n            force: 1250 + Math.random() * 200,\n            success_rate: 98.5 + Math.random() * 1,\n            cycle_time: 180 + Math.random() * 30\n        },\n        crane: {\n            load: 2.5 + Math.random() * 0.5,\n            height: 8.5 + Math.random() * 1,\n            position: \"区域B-03\",\n            status: Math.random() > 0.1 ? \"正常\" : \"维护\"\n        }\n    },\n    // 模块7: 成品质检\n    module7: {\n        dimensions: {\n            length: 2998 + Math.random() * 4,\n            width: 1498 + Math.random() * 3,\n            height: 199.5 + Math.random() * 1,\n            tolerance: \"±2mm\"\n        },\n        quality: {\n            surface_grade: \"A级\",\n            strength_grade: \"C30\",\n            pass_rate: 96.5 + Math.random() * 2.5,\n            defect_count: Math.floor(Math.random() * 3)\n        }\n    },\n    // 模块8: 入库管理\n    module8: {\n        inventory: {\n            total_products: 2456,\n            today_in: data.dailyCompleted,\n            today_out: 145,\n            available_space: 85 + Math.random() * 10\n        },\n        logistics: {\n            pending_orders: 23,\n            shipping_today: 12,\n            location_A: 156,\n            location_B: 234,\n            location_C: 189\n        }\n    }\n};\n\n// 发送各模块数据\nreturn [\n    {payload: moduleData.module1, topic: \"module1_data\"},\n    {payload: moduleData.module2, topic: \"module2_data\"},\n    {payload: moduleData.module3, topic: \"module3_data\"},\n    {payload: moduleData.module4, topic: \"module4_data\"},\n    {payload: moduleData.module5, topic: \"module5_data\"},\n    {payload: moduleData.module6, topic: \"module6_data\"},\n    {payload: moduleData.module7, topic: \"module7_data\"},\n    {payload: moduleData.module8, topic: \"module8_data\"}\n];",
+        "outputs": 8,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 520,
+        "y": 860,
+        "wires": [
+            [
+                "module1_ui",
+                "m1_equipment_ui",
+                "m1_quality_ui",
+                "b82288bf6a61ca7b"
+            ],
+            [
+                "module2_ui",
+                "m2_assembly_ui",
+                "6f26d0cbcb44a082"
+            ],
+            [
+                "module3_ui",
+                "m3_mesh_ui",
+                "911ddbd63d13f0c5"
+            ],
+            [
+                "module4_ui",
+                "m4_vibrate_ui",
+                "39d05d6f8e044731"
+            ],
+            [
+                "module5_ui",
+                "m5_chamber2_ui",
+                "7aa351559763a426"
+            ],
+            [
+                "module6_ui",
+                "m6_crane_ui",
+                "ed033cfc3e231201"
+            ],
+            [
+                "module7_ui",
+                "m7_quality_ui",
+                "de08985d68c26b14"
+            ],
+            [
+                "module8_ui",
+                "m8_logistics_ui",
+                "7c796173bfe9f219"
+            ]
+        ]
+    },
+    {
+        "id": "module1_ui",
+        "type": "ui_template",
+        "z": "main_flow_tab",
+        "group": "m1_group1",
+        "name": "原料状态",
+        "order": 1,
+        "width": "6",
+        "height": "4",
+        "format": "<h4>原材余量</h4><ul><li>水泥：{{msg.payload.materials.cement | number:1}} %</li><li>砂：{{msg.payload.materials.sand | number:1}} %</li><li>碎石：{{msg.payload.materials.gravel | number:1}} %</li><li>水：{{msg.payload.materials.water | number:1}} %</li><li>外加剂：{{msg.payload.materials.additive | number:1}} %</li></ul>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 980,
+        "y": 500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "m1_equipment_ui",
+        "type": "ui_template",
+        "z": "main_flow_tab",
+        "group": "m1_group2",
+        "name": "搅拌设备",
+        "order": 1,
+        "width": "6",
+        "height": "4",
+        "format": "<h4>搅拌机状态</h4><ul><li>转速：{{msg.payload.mixer.speed | number:1}} rpm</li><li>功率：{{msg.payload.mixer.power | number:1}} kW</li><li>温度：{{msg.payload.mixer.temperature | number:1}} ℃</li></ul>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 1140,
+        "y": 500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "m1_quality_ui",
+        "type": "ui_template",
+        "z": "main_flow_tab",
+        "group": "m1_group3",
+        "name": "质量参数",
+        "order": 1,
+        "width": "6",
+        "height": "4",
+        "format": "<h4>当前质量指标</h4><ul><li>塌落度：{{msg.payload.quality.slump | number:1}} mm</li><li>抗压强度：{{msg.payload.quality.strength | number:1}} MPa</li><li>密实度：{{msg.payload.quality.density | number:1}} kg/m³</li></ul>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 820,
+        "y": 500,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "module2_ui",
+        "type": "ui_template",
+        "z": "main_flow_tab",
+        "group": "m2_group1",
+        "name": "模具信息",
+        "order": 1,
+        "width": "6",
+        "height": "5",
+        "format": "<h4>模具使用情况</h4><ul><li>可用：{{msg.payload.molds.available}} 套</li><li>使用中：{{msg.payload.molds.inUse}} 套</li><li>清洁中：{{msg.payload.molds.cleaning}} 套</li><li>维护：{{msg.payload.molds.maintenance}} 套</li></ul>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 900,
+        "y": 620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "m2_assembly_ui",
+        "type": "ui_template",
+        "z": "main_flow_tab",
+        "group": "m2_group2",
+        "name": "组装状态",
+        "order": 1,
+        "width": "6",
+        "height": "4",
+        "format": "<h4>组装参数</h4><ul><li>定位精度：{{msg.payload.assembly.position_accuracy | number:2}} %</li><li>锁紧状态：{{msg.payload.assembly.lock_status}}</li><li>清洗压力：{{msg.payload.assembly.cleaning_pressure | number:1}} bar</li></ul>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 1080,
+        "y": 620,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "module3_ui",
+        "type": "ui_template",
+        "z": "main_flow_tab",
+        "group": "m3_group1",
+        "name": "钢筋安装",
+        "order": 1,
+        "width": "6",
+        "height": "5",
+        "format": "<h4>钢筋参数</h4><ul><li>库存：{{msg.payload.rebar.inventory}} 根</li><li>规格：{{msg.payload.rebar.specifications}}</li><li>安装位置：X={{msg.payload.rebar.position_x | number:1}} Y={{msg.payload.rebar.position_y | number:1}}</li><li>安装力：{{msg.payload.rebar.installation_force | number:0}} N</li></ul>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 900,
+        "y": 740,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "m3_mesh_ui",
+        "type": "ui_template",
+        "z": "main_flow_tab",
+        "group": "m3_group2",
+        "name": "网片参数",
+        "order": 1,
+        "width": "6",
+        "height": "4",
+        "format": "<h4>网片参数</h4><ul><li>库存：{{msg.payload.mesh.inventory}} 张</li><li>规格：{{msg.payload.mesh.specifications}}</li><li>铺设覆盖率：{{msg.payload.mesh.coverage | number:1}} %</li></ul>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 1080,
+        "y": 740,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "module4_ui",
+        "type": "ui_template",
+        "z": "main_flow_tab",
+        "group": "m4_group1",
+        "name": "浇筑过程",
+        "order": 1,
+        "width": "6",
+        "height": "5",
+        "format": "<h4>浇筑参数</h4><ul><li>流量：{{msg.payload.pouring.flow_rate | number:1}} m³/h</li><li>压力：{{msg.payload.pouring.pressure | number:2}} MPa</li><li>温度：{{msg.payload.pouring.temperature | number:1}} ℃</li><li>高度：{{msg.payload.pouring.height | number:0}} mm</li></ul>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 900,
+        "y": 860,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "m4_vibrate_ui",
+        "type": "ui_template",
+        "z": "main_flow_tab",
+        "group": "m4_group2",
+        "name": "振捣参数",
+        "order": 1,
+        "width": "6",
+        "height": "4",
+        "format": "<h4>振捣过程</h4><ul><li>频率：{{msg.payload.vibration.frequency | number:1}} Hz</li><li>振幅：{{msg.payload.vibration.amplitude | number:2}} mm</li><li>持续时间：{{msg.payload.vibration.duration | number:0}} s</li></ul>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 1080,
+        "y": 860,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "module5_ui",
+        "type": "ui_template",
+        "z": "main_flow_tab",
+        "group": "m5_group1",
+        "name": "养护仓1",
+        "order": 1,
+        "width": "6",
+        "height": "5",
+        "format": "<h4>养护仓1参数</h4><ul><li>温度：{{msg.payload.chamber1.temperature | number:1}} ℃</li><li>湿度：{{msg.payload.chamber1.humidity | number:1}} %</li><li>压力：{{msg.payload.chamber1.pressure | number:2}} bar</li><li>剩余时间：{{msg.payload.chamber1.time_remaining | number:0}} min</li></ul>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 900,
+        "y": 980,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "m5_chamber2_ui",
+        "type": "ui_template",
+        "z": "main_flow_tab",
+        "group": "m5_group2",
+        "name": "养护仓2",
+        "order": 1,
+        "width": "6",
+        "height": "4",
+        "format": "<h4>养护仓2参数</h4><ul><li>温度：{{msg.payload.chamber2.temperature | number:1}} ℃</li><li>湿度：{{msg.payload.chamber2.humidity | number:1}} %</li><li>压力：{{msg.payload.chamber2.pressure | number:2}} bar</li><li>剩余时间：{{msg.payload.chamber2.time_remaining | number:0}} min</li></ul>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 1080,
+        "y": 980,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "module6_ui",
+        "type": "ui_template",
+        "z": "main_flow_tab",
+        "group": "m6_group1",
+        "name": "脱模参数",
+        "order": 1,
+        "width": "6",
+        "height": "5",
+        "format": "<h4>脱模工序</h4><ul><li>脱模力：{{msg.payload.demolding.force | number:0}} N</li><li>成功率：{{msg.payload.demolding.success_rate | number:2}} %</li><li>周期时长：{{msg.payload.demolding.cycle_time | number:0}} s</li></ul>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 1080,
+        "y": 1100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "m6_crane_ui",
+        "type": "ui_template",
+        "z": "main_flow_tab",
+        "group": "m6_group2",
+        "name": "起吊参数",
+        "order": 1,
+        "width": "6",
+        "height": "4",
+        "format": "<h4>起吊工序</h4><ul><li>当前负载：{{msg.payload.crane.load | number:1}} t</li><li>升降高度：{{msg.payload.crane.height | number:2}} m</li><li>位置：{{msg.payload.crane.position}}</li><li>状态：{{msg.payload.crane.status}}</li></ul>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 900,
+        "y": 1100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "module7_ui",
+        "type": "ui_template",
+        "z": "main_flow_tab",
+        "group": "m7_group1",
+        "name": "尺寸参数",
+        "order": 1,
+        "width": "6",
+        "height": "4",
+        "format": "<h4>成品尺寸</h4><ul><li>长度：{{msg.payload.dimensions.length | number:1}} mm</li><li>宽度：{{msg.payload.dimensions.width | number:1}} mm</li><li>高度：{{msg.payload.dimensions.height | number:1}} mm</li><li>尺寸公差：{{msg.payload.dimensions.tolerance}}</li></ul>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 1080,
+        "y": 1220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "m7_quality_ui",
+        "type": "ui_template",
+        "z": "main_flow_tab",
+        "group": "m7_group2",
+        "name": "质量指标",
+        "order": 1,
+        "width": "6",
+        "height": "4",
+        "format": "<h4>质量检测</h4><ul><li>表面等级：{{msg.payload.quality.surface_grade}}</li><li>强度等级：{{msg.payload.quality.strength_grade}}</li><li>合格率：{{msg.payload.quality.pass_rate | number:2}} %</li><li>缺陷数：{{msg.payload.quality.defect_count}}</li></ul>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 900,
+        "y": 1220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "module8_ui",
+        "type": "ui_template",
+        "z": "main_flow_tab",
+        "group": "m8_group1",
+        "name": "库存信息",
+        "order": 1,
+        "width": "6",
+        "height": "5",
+        "format": "<h4>仓库库存</h4><ul><li>总库存：{{msg.payload.inventory.total_products}} 件</li><li>今日入库：{{msg.payload.inventory.today_in}} 件</li><li>今日出库：{{msg.payload.inventory.today_out}} 件</li><li>可用面积：{{msg.payload.inventory.available_space | number:1}} %</li></ul>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 900,
+        "y": 1320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "m8_logistics_ui",
+        "type": "ui_template",
+        "z": "main_flow_tab",
+        "group": "m8_group2",
+        "name": "物流信息",
+        "order": 1,
+        "width": "6",
+        "height": "4",
+        "format": "<h4>物流与库区</h4><ul><li>待发货订单：{{msg.payload.logistics.pending_orders}}</li><li>今日发货：{{msg.payload.logistics.shipping_today}}</li><li>库区A存量：{{msg.payload.logistics.location_A}}</li><li>库区B存量：{{msg.payload.logistics.location_B}}</li><li>库区C存量：{{msg.payload.logistics.location_C}}</li></ul>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "x": 1080,
+        "y": 1320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "b5e77968ad47801a",
+        "type": "ui_template",
+        "z": "main_flow_tab",
+        "d": true,
+        "group": "overview_group1",
+        "name": "生产线状态显示",
+        "order": 1,
+        "width": "12",
+        "height": "8",
+        "format": "<div ng-bind-html=\"msg.payload\"></div>",
+        "storeOutMessages": false,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1800,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "42dff8e64a5b31d1",
+        "type": "ui_text",
+        "z": "main_flow_tab",
+        "group": "group_stats",
+        "order": 1,
+        "width": 6,
+        "height": 1,
+        "name": "日产量目标",
+        "label": "日产量目标",
+        "format": "{{msg.payload.dailyTarget}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": "",
+        "color": "#000000",
+        "x": 810,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "8bd7d6c4dc0d4897",
+        "type": "ui_text",
+        "z": "main_flow_tab",
+        "group": "group_stats",
+        "order": 2,
+        "width": 6,
+        "height": 1,
+        "name": "已完成产量",
+        "label": "已完成产量",
+        "format": "{{msg.payload.dailyCompleted}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": "",
+        "color": "#000000",
+        "x": 810,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "cebf59e2a154bd17",
+        "type": "ui_gauge",
+        "z": "main_flow_tab",
+        "name": "完成率仪表盘",
+        "group": "group_stats",
+        "order": 3,
+        "width": 6,
+        "height": 6,
+        "gtype": "wave",
+        "title": "完成率(%)",
+        "label": "%",
+        "format": "{{value}}",
+        "min": 0,
+        "max": "100",
+        "colors": [
+            "#ff0000",
+            "#e6ff00",
+            "#00ff19"
+        ],
+        "seg1": "50",
+        "seg2": "80",
+        "diff": false,
+        "className": "",
+        "x": 1020,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "dd9c89f17ddc2f90",
+        "type": "ui_text",
+        "z": "main_flow_tab",
+        "group": "group_stats",
+        "order": 4,
+        "width": 6,
+        "height": 1,
+        "name": "告警数量",
+        "label": "告警数量",
+        "format": "{{msg.payload.alarmCount}}",
+        "layout": "row-spread",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": "",
+        "color": "#000000",
+        "x": 1100,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "f5d8ad844640e02a",
+        "type": "ui_text",
+        "z": "main_flow_tab",
+        "group": "group_modules",
+        "order": 1,
+        "width": 12,
+        "height": 1,
+        "name": "模块1",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": "",
+        "color": "#000000",
+        "x": 1150,
+        "y": 460,
+        "wires": []
+    },
+    {
+        "id": "15cb331111c56fec",
+        "type": "ui_text",
+        "z": "main_flow_tab",
+        "group": "group_modules",
+        "order": 2,
+        "width": 12,
+        "height": 1,
+        "name": "模块2",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": "",
+        "color": "#000000",
+        "x": 1150,
+        "y": 580,
+        "wires": []
+    },
+    {
+        "id": "a8c9437fc755a4f6",
+        "type": "ui_text",
+        "z": "main_flow_tab",
+        "group": "group_modules",
+        "order": 3,
+        "width": 12,
+        "height": 1,
+        "name": "模块3",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": "",
+        "color": "#000000",
+        "x": 1150,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "2ff73753b3853b8e",
+        "type": "ui_text",
+        "z": "main_flow_tab",
+        "group": "group_modules",
+        "order": 4,
+        "width": 12,
+        "height": 1,
+        "name": "模块4",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": "",
+        "color": "#000000",
+        "x": 1150,
+        "y": 820,
+        "wires": []
+    },
+    {
+        "id": "d2925983fe8f6e22",
+        "type": "ui_text",
+        "z": "main_flow_tab",
+        "group": "group_modules",
+        "order": 5,
+        "width": 12,
+        "height": 1,
+        "name": "模块5",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": "",
+        "color": "#000000",
+        "x": 1150,
+        "y": 940,
+        "wires": []
+    },
+    {
+        "id": "eb4f33211ed95194",
+        "type": "ui_text",
+        "z": "main_flow_tab",
+        "group": "group_modules",
+        "order": 6,
+        "width": 12,
+        "height": 1,
+        "name": "模块6",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": "",
+        "color": "#000000",
+        "x": 1150,
+        "y": 1060,
+        "wires": []
+    },
+    {
+        "id": "5b1119906063b61d",
+        "type": "ui_text",
+        "z": "main_flow_tab",
+        "group": "group_modules",
+        "order": 7,
+        "width": 12,
+        "height": 1,
+        "name": "模块7",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": "",
+        "color": "#000000",
+        "x": 1170,
+        "y": 1180,
+        "wires": []
+    },
+    {
+        "id": "3884b4df3d57760f",
+        "type": "ui_text",
+        "z": "main_flow_tab",
+        "group": "group_modules",
+        "order": 8,
+        "width": 12,
+        "height": 1,
+        "name": "模块8",
+        "label": "",
+        "format": "{{msg.payload}}",
+        "layout": "row-left",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": "",
+        "color": "#000000",
+        "x": 1170,
+        "y": 1280,
+        "wires": []
+    },
+    {
+        "id": "83bb199f49935fac",
+        "type": "ui_text",
+        "z": "main_flow_tab",
+        "group": "group_alarms",
+        "order": 1,
+        "width": 12,
+        "height": 1,
+        "name": "告警1",
+        "label": "",
+        "format": "{{msg.payload[0] || ''}}",
+        "layout": "row-left",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": "",
+        "color": "#000000",
+        "x": 1090,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "64427adfc6a7cfca",
+        "type": "ui_text",
+        "z": "main_flow_tab",
+        "group": "group_alarms",
+        "order": 2,
+        "width": 12,
+        "height": 1,
+        "name": "告警2",
+        "label": "",
+        "format": "{{msg.payload[1] || ''}}",
+        "layout": "row-left",
+        "className": "",
+        "style": false,
+        "font": "",
+        "fontSize": "",
+        "color": "#000000",
+        "x": 1090,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "438171a7dbb989fe",
+        "type": "ui_text",
+        "z": "main_flow_tab",
+        "group": "group_alarms",
+        "order": 3,
+        "width": 12,
+        "height": 1,
+        "name": "告警3",
+        "label": "",
+        "format": "{{msg.payload[2] || ''}}",
+        "layout": "row-left",
+        "x": 1090,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "f4791849e38e1a8b",
+        "type": "ui_text",
+        "z": "main_flow_tab",
+        "group": "group_alarms",
+        "order": 4,
+        "width": 12,
+        "height": 1,
+        "name": "告警4",
+        "label": "",
+        "format": "{{msg.payload[3] || ''}}",
+        "layout": "row-left",
+        "x": 1090,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "ad624104bcfc386b",
+        "type": "ui_text",
+        "z": "main_flow_tab",
+        "group": "group_alarms",
+        "order": 5,
+        "width": 12,
+        "height": 1,
+        "name": "告警5",
+        "label": "",
+        "format": "{{msg.payload[4] || ''}}",
+        "layout": "row-left",
+        "x": 1090,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "20051ddd9e72c26e",
+        "type": "function",
+        "z": "main_flow_tab",
+        "name": "获取当日完成率",
+        "func": "\n\n\nmsg.payload = \nMath.round((msg.payload.dailyCompleted / msg.payload.dailyTarget) * 100);\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 820,
+        "y": 60,
+        "wires": [
+            [
+                "cebf59e2a154bd17"
+            ]
+        ]
+    },
+    {
+        "id": "b82288bf6a61ca7b",
+        "type": "function",
+        "z": "main_flow_tab",
+        "name": "function 1",
+        "func": "let mat = msg.payload.materials;\nmsg.payload =\n    `混凝土预备: ${mat.cement.toFixed(2)}kg，外加剂: ${mat.additive.toFixed(2)}kg`;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 820,
+        "y": 460,
+        "wires": [
+            [
+                "f5d8ad844640e02a"
+            ]
+        ]
+    },
+    {
+        "id": "6f26d0cbcb44a082",
+        "type": "function",
+        "z": "main_flow_tab",
+        "name": "function 2",
+        "func": "let molds = msg.payload.molds;\nlet ass = msg.payload.assembly;\nmsg.payload =\n    `模具组装:\\n` +\n    `模具-可用: ${molds.available}，在用: ${molds.inUse}，清洗: ${molds.cleaning}，维护: ${molds.maintenance}\\n`\n    ;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 820,
+        "y": 580,
+        "wires": [
+            [
+                "15cb331111c56fec"
+            ]
+        ]
+    },
+    {
+        "id": "911ddbd63d13f0c5",
+        "type": "function",
+        "z": "main_flow_tab",
+        "name": "function 3",
+        "func": "/*\nlet rebar = msg.payload.rebar;\nlet mesh = msg.payload.mesh;\nmsg.payload =\n    `钢筋网片安装:\\n` +\n    `钢筋-库存: ${ rebar.inventory }，网片-库存: ${ mesh.inventory } \\n`\n    ;\nreturn msg;\n*/\n\n\nlet rebar = msg.payload.rebar;\nlet mesh = msg.payload.mesh;\nmsg.payload =\n    `<span style=\"color:red;\">钢筋网片安装</span>:\\n` +\n    `钢筋-库存: ${rebar.inventory}，网片-库存: ${mesh.inventory}\\n`;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 820,
+        "y": 700,
+        "wires": [
+            [
+                "a8c9437fc755a4f6"
+            ]
+        ],
+        "info": "<div style=\"white-space:pre-line;\">{{{msg.payload}}}</div>"
+    },
+    {
+        "id": "39d05d6f8e044731",
+        "type": "function",
+        "z": "main_flow_tab",
+        "name": "function 4",
+        "func": "let pour = msg.payload.pouring;\nlet vib = msg.payload.vibration;\nmsg.payload =\n    `混凝土浇筑:\\n` +\n    `流量: ${pour.flow_rate.toFixed(2)}m³/h，压力: ${pour.pressure.toFixed(2)}MPa，温度: ${pour.temperature.toFixed(2)}℃`;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 820,
+        "y": 820,
+        "wires": [
+            [
+                "2ff73753b3853b8e"
+            ]
+        ]
+    },
+    {
+        "id": "7aa351559763a426",
+        "type": "function",
+        "z": "main_flow_tab",
+        "name": "function 5",
+        "func": "let c1 = msg.payload.chamber1;\nlet c2 = msg.payload.chamber2;\nmsg.payload =\n    `养护: \\n` +\n    `1号室-温度: ${c1.temperature.toFixed(2)}℃， 压力: ${c1.pressure.toFixed(2)}MPa \\n` +\n    `2号室-温度: ${c2.temperature.toFixed(2)}℃， 压力: ${c2.pressure.toFixed(2)}MPa`;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 820,
+        "y": 940,
+        "wires": [
+            [
+                "d2925983fe8f6e22"
+            ]
+        ]
+    },
+    {
+        "id": "ed033cfc3e231201",
+        "type": "function",
+        "z": "main_flow_tab",
+        "name": "function 6",
+        "func": "let dem = msg.payload.demolding;\nlet crane = msg.payload.crane;\nmsg.payload =\n    `脱模与起吊:` +\n    `状态: ${crane.status}`;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 820,
+        "y": 1060,
+        "wires": [
+            [
+                "eb4f33211ed95194"
+            ]
+        ]
+    },
+    {
+        "id": "de08985d68c26b14",
+        "type": "function",
+        "z": "main_flow_tab",
+        "name": "function 7",
+        "func": "let dim = msg.payload.dimensions;\nlet qual = msg.payload.quality;\nmsg.payload =\n    `成品质检:\\n` +\n    `质量-表面: ${qual.surface_grade}，合格率: ${qual.pass_rate.toFixed(2)}%，缺陷数: ${qual.defect_count}`;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 820,
+        "y": 1180,
+        "wires": [
+            [
+                "5b1119906063b61d"
+            ]
+        ]
+    },
+    {
+        "id": "7c796173bfe9f219",
+        "type": "function",
+        "z": "main_flow_tab",
+        "name": "function 8",
+        "func": "let inv = msg.payload.inventory;\nlet log = msg.payload.logistics;\nmsg.payload =\n    `仓库管理:\\n` +\n    `总数: ${inv.total_products}，今日入库: ${inv.today_in}，今日出库: ${inv.today_out}，空余位: ${inv.available_space.toFixed(2)}\\n` +\n    `物流-待发: ${log.pending_orders}，今日发货: ${log.shipping_today}，A区: ${log.location_A}，B区: ${log.location_B}，C区: ${log.location_C}`;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 820,
+        "y": 1280,
+        "wires": [
+            [
+                "3884b4df3d57760f"
+            ]
+        ]
+    },
+    {
+        "id": "overview_group2",
+        "type": "ui_group",
+        "name": "生产统计",
+        "tab": "main_overview_tab",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "overview_group3",
+        "type": "ui_group",
+        "name": "实时报警",
+        "tab": "main_overview_tab",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "m1_group1",
+        "type": "ui_group",
+        "name": "原料状态",
+        "tab": "module1_tab",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "m1_group2",
+        "type": "ui_group",
+        "name": "搅拌设备",
+        "tab": "module1_tab",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "m1_group3",
+        "type": "ui_group",
+        "name": "质量参数",
+        "tab": "module1_tab",
+        "order": 3,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "m2_group1",
+        "type": "ui_group",
+        "name": "模具信息",
+        "tab": "module2_tab",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "m2_group2",
+        "type": "ui_group",
+        "name": "组装状态",
+        "tab": "module2_tab",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "m3_group1",
+        "type": "ui_group",
+        "name": "钢筋安装",
+        "tab": "module3_tab",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "m3_group2",
+        "type": "ui_group",
+        "name": "网片安装",
+        "tab": "module3_tab",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "m4_group1",
+        "type": "ui_group",
+        "name": "浇筑过程",
+        "tab": "module4_tab",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "m4_group2",
+        "type": "ui_group",
+        "name": "振捣过程",
+        "tab": "module4_tab",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "m5_group1",
+        "type": "ui_group",
+        "name": "养护仓1",
+        "tab": "module5_tab",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "m5_group2",
+        "type": "ui_group",
+        "name": "养护仓2",
+        "tab": "module5_tab",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "m6_group1",
+        "type": "ui_group",
+        "name": "脱模工序",
+        "tab": "module6_tab",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "m6_group2",
+        "type": "ui_group",
+        "name": "起吊工序",
+        "tab": "module6_tab",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "m7_group1",
+        "type": "ui_group",
+        "name": "尺寸与外观",
+        "tab": "module7_tab",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "m7_group2",
+        "type": "ui_group",
+        "name": "质量检验",
+        "tab": "module7_tab",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "m8_group1",
+        "type": "ui_group",
+        "name": "库存信息",
+        "tab": "module8_tab",
+        "order": 1,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "m8_group2",
+        "type": "ui_group",
+        "name": "物流管理",
+        "tab": "module8_tab",
+        "order": 2,
+        "disp": true,
+        "width": "6",
+        "collapse": false
+    },
+    {
+        "id": "overview_group1",
+        "type": "ui_group",
+        "name": "生产线状态",
+        "tab": "main_overview_tab",
+        "order": 1,
+        "disp": true,
+        "width": "12",
+        "collapse": false
+    },
+    {
+        "id": "group_stats",
+        "type": "ui_group",
+        "name": "生产统计",
+        "tab": "tab_main",
+        "order": 1,
+        "disp": true,
+        "width": 12,
+        "collapse": false
+    },
+    {
+        "id": "group_modules",
+        "type": "ui_group",
+        "name": "模块状态",
+        "tab": "tab_main",
+        "order": 2,
+        "disp": true,
+        "width": 12,
+        "collapse": false
+    },
+    {
+        "id": "group_alarms",
+        "type": "ui_group",
+        "name": "告警信息",
+        "tab": "tab_main",
+        "order": 3,
+        "disp": true,
+        "width": 12,
+        "collapse": false
+    },
+    {
+        "id": "main_overview_tab",
+        "type": "ui_tab",
+        "name": "生产总览",
+        "icon": "dashboard",
+        "order": 3,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "module1_tab",
+        "type": "ui_tab",
+        "name": "混凝土制备",
+        "icon": "build",
+        "order": 6,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "module2_tab",
+        "type": "ui_tab",
+        "name": "模具组装",
+        "icon": "view_module",
+        "order": 5,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "module3_tab",
+        "type": "ui_tab",
+        "name": "钢筋网片安装",
+        "icon": "grid_on",
+        "order": 7,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "module4_tab",
+        "type": "ui_tab",
+        "name": "混凝土浇筑",
+        "icon": "opacity",
+        "order": 8,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "module5_tab",
+        "type": "ui_tab",
+        "name": "养护",
+        "icon": "thermostat",
+        "order": 9,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "module6_tab",
+        "type": "ui_tab",
+        "name": "脱模与起吊",
+        "icon": "elevator",
+        "order": 10,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "module7_tab",
+        "type": "ui_tab",
+        "name": "成品质检",
+        "icon": "verified",
+        "order": 11,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "module8_tab",
+        "type": "ui_tab",
+        "name": "入库管理",
+        "icon": "inventory",
+        "order": 12,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "tab_main",
+        "type": "ui_tab",
+        "name": "生产监控",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    }
+]
