@@ -1,0 +1,2051 @@
+[
+    {
+        "id": "f15c6dd0e0f3d568",
+        "type": "OpcUa-Client",
+        "z": "4ecf18f9db264ff0",
+        "endpoint": "9ce077ca2aecb7b6",
+        "action": "read",
+        "deadbandtype": "None",
+        "deadbandvalue": 0,
+        "time": 5,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "useTransport": false,
+        "maxChunkCount": "",
+        "maxMessageSize": "",
+        "receiveBufferSize": "",
+        "sendBufferSize": "",
+        "setstatusandtime": false,
+        "keepsessionalive": false,
+        "name": "Read Concrete Variables 1",
+        "x": 580,
+        "y": 140,
+        "wires": [
+            [
+                "5abc58e338ad0549"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "5abc58e338ad0549",
+        "type": "debug",
+        "z": "4ecf18f9db264ff0",
+        "name": "OPC UA Read Output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 800,
+        "y": 140,
+        "wires": []
+    },
+    {
+        "id": "inj1",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module1_cement",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "ns=1;s=precast_line1.module1.materials.cement",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 40,
+        "wires": [
+            [
+                "f15c6dd0e0f3d568"
+            ]
+        ]
+    },
+    {
+        "id": "inj2",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module1_sand",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "ns=1;s=precast_line1.module1.materials.sand",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 60,
+        "wires": [
+            [
+                "f15c6dd0e0f3d568"
+            ]
+        ]
+    },
+    {
+        "id": "inj3",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module1_gravel",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module1.materials.gravel",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 80,
+        "wires": [
+            [
+                "f15c6dd0e0f3d568"
+            ]
+        ]
+    },
+    {
+        "id": "inj4",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module1_water",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module1.materials.water",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 100,
+        "wires": [
+            [
+                "f15c6dd0e0f3d568"
+            ]
+        ]
+    },
+    {
+        "id": "inj5",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module1_additive",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module1.materials.additive",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 120,
+        "wires": [
+            [
+                "f15c6dd0e0f3d568"
+            ]
+        ]
+    },
+    {
+        "id": "inj6",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module1_speed",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module1.mixer.speed",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 140,
+        "wires": [
+            [
+                "f15c6dd0e0f3d568"
+            ]
+        ]
+    },
+    {
+        "id": "inj7",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module1_power",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module1.mixer.power",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 160,
+        "wires": [
+            [
+                "f15c6dd0e0f3d568"
+            ]
+        ]
+    },
+    {
+        "id": "inj8",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module1_temperature",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "ns=1;s=precast_line1.module1.mixer.temperature",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 180,
+        "wires": [
+            [
+                "f15c6dd0e0f3d568"
+            ]
+        ]
+    },
+    {
+        "id": "inj9",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module1_slump",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "ns=1;s=precast_line1.module1.quality.slump",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 200,
+        "wires": [
+            [
+                "f15c6dd0e0f3d568"
+            ]
+        ]
+    },
+    {
+        "id": "inj10",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module1_strength",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module1.quality.strength",
+        "payload": "",
+        "payloadType": "date",
+        "x": 170,
+        "y": 220,
+        "wires": [
+            [
+                "f15c6dd0e0f3d568"
+            ]
+        ]
+    },
+    {
+        "id": "inj11",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module1_density",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module1.quality.density",
+        "payload": "",
+        "payloadType": "date",
+        "x": 160,
+        "y": 240,
+        "wires": [
+            [
+                "f15c6dd0e0f3d568"
+            ]
+        ]
+    },
+    {
+        "id": "inj12",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module2_molds_available",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "ns=1;s=precast_line1.module2.molds.available",
+        "payload": "",
+        "payloadType": "date",
+        "x": 190,
+        "y": 280,
+        "wires": [
+            [
+                "4599915db0fcc19b"
+            ]
+        ]
+    },
+    {
+        "id": "inj13",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module2_molds_inUse",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module2.molds.inUse",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 300,
+        "wires": [
+            [
+                "4599915db0fcc19b"
+            ]
+        ]
+    },
+    {
+        "id": "inj14",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module2_molds_cleaning",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module2.molds.cleaning",
+        "payload": "",
+        "payloadType": "date",
+        "x": 190,
+        "y": 320,
+        "wires": [
+            [
+                "4599915db0fcc19b"
+            ]
+        ]
+    },
+    {
+        "id": "inj15",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module2_molds_maintenance",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module2.molds.maintenance",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 340,
+        "wires": [
+            [
+                "4599915db0fcc19b"
+            ]
+        ]
+    },
+    {
+        "id": "inj16",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module2_position_accuracy",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module2.assembly.position_accuracy",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 360,
+        "wires": [
+            [
+                "4599915db0fcc19b"
+            ]
+        ]
+    },
+    {
+        "id": "inj17",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module2_lock_status",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module2.assembly.lock_status",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 380,
+        "wires": [
+            [
+                "4599915db0fcc19b"
+            ]
+        ]
+    },
+    {
+        "id": "inj18",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module2_cleaning_pressure",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module2.assembly.cleaning_pressure",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 400,
+        "wires": [
+            [
+                "4599915db0fcc19b"
+            ]
+        ]
+    },
+    {
+        "id": "inj19",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module3_rebar_inventory",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "ns=1;s=precast_line1.module3.rebar.inventory",
+        "payload": "",
+        "payloadType": "date",
+        "x": 190,
+        "y": 440,
+        "wires": [
+            [
+                "6f6cfc6b0a1d389a"
+            ]
+        ]
+    },
+    {
+        "id": "inj20",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module3_rebar_specifications",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module3.rebar.specifications",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 460,
+        "wires": [
+            [
+                "6f6cfc6b0a1d389a"
+            ]
+        ]
+    },
+    {
+        "id": "inj21",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module3_rebar_position_x",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module3.rebar.position_x",
+        "payload": "",
+        "payloadType": "date",
+        "x": 190,
+        "y": 480,
+        "wires": [
+            [
+                "6f6cfc6b0a1d389a"
+            ]
+        ]
+    },
+    {
+        "id": "inj22",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module3_rebar_position_y",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module3.rebar.position_y",
+        "payload": "",
+        "payloadType": "date",
+        "x": 190,
+        "y": 500,
+        "wires": [
+            [
+                "6f6cfc6b0a1d389a"
+            ]
+        ]
+    },
+    {
+        "id": "inj23",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module3_rebar_installation_force",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module3.rebar.installation_force",
+        "payload": "",
+        "payloadType": "date",
+        "x": 210,
+        "y": 520,
+        "wires": [
+            [
+                "6f6cfc6b0a1d389a"
+            ]
+        ]
+    },
+    {
+        "id": "inj24",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module3_mesh_inventory",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module3.mesh.inventory",
+        "payload": "",
+        "payloadType": "date",
+        "x": 190,
+        "y": 540,
+        "wires": [
+            [
+                "6f6cfc6b0a1d389a"
+            ]
+        ]
+    },
+    {
+        "id": "inj25",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module3_mesh_specifications",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module3.mesh.specifications",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 560,
+        "wires": [
+            [
+                "6f6cfc6b0a1d389a"
+            ]
+        ]
+    },
+    {
+        "id": "inj26",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module3_mesh_coverage",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module3.mesh.coverage",
+        "payload": "",
+        "payloadType": "date",
+        "x": 190,
+        "y": 580,
+        "wires": [
+            [
+                "6f6cfc6b0a1d389a"
+            ]
+        ]
+    },
+    {
+        "id": "4599915db0fcc19b",
+        "type": "OpcUa-Client",
+        "z": "4ecf18f9db264ff0",
+        "endpoint": "9ce077ca2aecb7b6",
+        "action": "read",
+        "deadbandtype": "None",
+        "deadbandvalue": 0,
+        "time": 5,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "useTransport": false,
+        "maxChunkCount": "",
+        "maxMessageSize": "",
+        "receiveBufferSize": "",
+        "sendBufferSize": "",
+        "setstatusandtime": false,
+        "keepsessionalive": false,
+        "name": "Read Concrete Variables 2",
+        "x": 580,
+        "y": 340,
+        "wires": [
+            [
+                "a7134d5146b4e20e"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "6f6cfc6b0a1d389a",
+        "type": "OpcUa-Client",
+        "z": "4ecf18f9db264ff0",
+        "endpoint": "9ce077ca2aecb7b6",
+        "action": "read",
+        "deadbandtype": "None",
+        "deadbandvalue": 0,
+        "time": 5,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "useTransport": false,
+        "maxChunkCount": "",
+        "maxMessageSize": "",
+        "receiveBufferSize": "",
+        "sendBufferSize": "",
+        "setstatusandtime": false,
+        "keepsessionalive": false,
+        "name": "Read Concrete Variables 3",
+        "x": 580,
+        "y": 520,
+        "wires": [
+            [
+                "b4aa13a54124b4e5"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "b4aa13a54124b4e5",
+        "type": "debug",
+        "z": "4ecf18f9db264ff0",
+        "name": "OPC UA Read Output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 800,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "a7134d5146b4e20e",
+        "type": "debug",
+        "z": "4ecf18f9db264ff0",
+        "name": "OPC UA Read Output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 800,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "inj27",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module4_pouring_flow_rate",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module4.pouring.flow_rate",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 640,
+        "wires": [
+            [
+                "9ee92af5be47d819"
+            ]
+        ]
+    },
+    {
+        "id": "inj28",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module4_pouring_pressure",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module4.pouring.pressure",
+        "payload": "",
+        "payloadType": "date",
+        "x": 190,
+        "y": 660,
+        "wires": [
+            [
+                "9ee92af5be47d819"
+            ]
+        ]
+    },
+    {
+        "id": "inj29",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module4_pouring_temperature",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module4.pouring.temperature",
+        "payload": "",
+        "payloadType": "date",
+        "x": 210,
+        "y": 680,
+        "wires": [
+            [
+                "9ee92af5be47d819"
+            ]
+        ]
+    },
+    {
+        "id": "inj30",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module4_pouring_height",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module4.pouring.height",
+        "payload": "",
+        "payloadType": "date",
+        "x": 190,
+        "y": 700,
+        "wires": [
+            [
+                "9ee92af5be47d819"
+            ]
+        ]
+    },
+    {
+        "id": "inj31",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module4_vibration_frequency",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module4.vibration.frequency",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 720,
+        "wires": [
+            [
+                "9ee92af5be47d819"
+            ]
+        ]
+    },
+    {
+        "id": "inj32",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module4_vibration_amplitude",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module4.vibration.amplitude",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 740,
+        "wires": [
+            [
+                "9ee92af5be47d819"
+            ]
+        ]
+    },
+    {
+        "id": "inj33",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module4_vibration_duration",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module4.vibration.duration",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 760,
+        "wires": [
+            [
+                "9ee92af5be47d819"
+            ]
+        ]
+    },
+    {
+        "id": "inj34",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module5_chamber1_temperature",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module5.chamber1.temperature",
+        "payload": "",
+        "payloadType": "date",
+        "x": 210,
+        "y": 800,
+        "wires": [
+            [
+                "e569af2ee32b966f"
+            ]
+        ]
+    },
+    {
+        "id": "inj35",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module5_chamber1_humidity",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module5.chamber1.humidity",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 820,
+        "wires": [
+            [
+                "e569af2ee32b966f"
+            ]
+        ]
+    },
+    {
+        "id": "inj36",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module5_chamber1_pressure",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module5.chamber1.pressure",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 840,
+        "wires": [
+            [
+                "e569af2ee32b966f"
+            ]
+        ]
+    },
+    {
+        "id": "inj37",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module5_chamber1_time_remaining",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module5.chamber1.time_remaining",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 860,
+        "wires": [
+            [
+                "e569af2ee32b966f"
+            ]
+        ]
+    },
+    {
+        "id": "inj38",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module5_chamber2_temperature",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module5.chamber2.temperature",
+        "payload": "",
+        "payloadType": "date",
+        "x": 210,
+        "y": 880,
+        "wires": [
+            [
+                "e569af2ee32b966f"
+            ]
+        ]
+    },
+    {
+        "id": "inj39",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module5_chamber2_humidity",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module5.chamber2.humidity",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 900,
+        "wires": [
+            [
+                "e569af2ee32b966f"
+            ]
+        ]
+    },
+    {
+        "id": "inj40",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module5_chamber2_pressure",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module5.chamber2.pressure",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 920,
+        "wires": [
+            [
+                "e569af2ee32b966f"
+            ]
+        ]
+    },
+    {
+        "id": "inj41",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module5_chamber2_time_remaining",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module5.chamber2.time_remaining",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 940,
+        "wires": [
+            [
+                "e569af2ee32b966f"
+            ]
+        ]
+    },
+    {
+        "id": "inj42",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module6_demolding_force",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module6.demolding.force",
+        "payload": "",
+        "payloadType": "date",
+        "x": 190,
+        "y": 980,
+        "wires": [
+            [
+                "f47108d300a2aebf"
+            ]
+        ]
+    },
+    {
+        "id": "inj43",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module6_demolding_success_rate",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module6.demolding.success_rate",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 1000,
+        "wires": [
+            [
+                "f47108d300a2aebf"
+            ]
+        ]
+    },
+    {
+        "id": "inj44",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module6_demolding_cycle_time",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module6.demolding.cycle_time",
+        "payload": "",
+        "payloadType": "date",
+        "x": 210,
+        "y": 1020,
+        "wires": [
+            [
+                "f47108d300a2aebf"
+            ]
+        ]
+    },
+    {
+        "id": "inj45",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module6_crane_load",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module6.crane.load",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 1040,
+        "wires": [
+            [
+                "f47108d300a2aebf"
+            ]
+        ]
+    },
+    {
+        "id": "inj46",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module6_crane_height",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module6.crane.height",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 1060,
+        "wires": [
+            [
+                "f47108d300a2aebf"
+            ]
+        ]
+    },
+    {
+        "id": "inj47",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module6_crane_position",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module6.crane.position",
+        "payload": "",
+        "payloadType": "date",
+        "x": 190,
+        "y": 1080,
+        "wires": [
+            [
+                "f47108d300a2aebf"
+            ]
+        ]
+    },
+    {
+        "id": "inj48",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module6_crane_status",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module6.crane.status",
+        "payload": "",
+        "payloadType": "date",
+        "x": 180,
+        "y": 1100,
+        "wires": [
+            [
+                "f47108d300a2aebf"
+            ]
+        ]
+    },
+    {
+        "id": "inj49",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module7_dimensions_length",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module7.dimensions.length",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 1140,
+        "wires": [
+            [
+                "37aa844aed60f44a"
+            ]
+        ]
+    },
+    {
+        "id": "inj50",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module7_dimensions_width",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module7.dimensions.width",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 1160,
+        "wires": [
+            [
+                "37aa844aed60f44a"
+            ]
+        ]
+    },
+    {
+        "id": "inj51",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module7_dimensions_height",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module7.dimensions.height",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 1180,
+        "wires": [
+            [
+                "37aa844aed60f44a"
+            ]
+        ]
+    },
+    {
+        "id": "inj52",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module7_dimensions_tolerance",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module7.dimensions.tolerance",
+        "payload": "",
+        "payloadType": "date",
+        "x": 210,
+        "y": 1200,
+        "wires": [
+            [
+                "37aa844aed60f44a"
+            ]
+        ]
+    },
+    {
+        "id": "inj53",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module7_quality_surface_grade",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module7.quality.surface_grade",
+        "payload": "",
+        "payloadType": "date",
+        "x": 210,
+        "y": 1220,
+        "wires": [
+            [
+                "37aa844aed60f44a"
+            ]
+        ]
+    },
+    {
+        "id": "inj54",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module7_quality_strength_grade",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module7.quality.strength_grade",
+        "payload": "",
+        "payloadType": "date",
+        "x": 210,
+        "y": 1240,
+        "wires": [
+            [
+                "37aa844aed60f44a"
+            ]
+        ]
+    },
+    {
+        "id": "inj55",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module7_quality_pass_rate",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module7.quality.pass_rate",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 1260,
+        "wires": [
+            [
+                "37aa844aed60f44a"
+            ]
+        ]
+    },
+    {
+        "id": "inj56",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module7_quality_defect_count",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module7.quality.defect_count",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 1280,
+        "wires": [
+            [
+                "37aa844aed60f44a"
+            ]
+        ]
+    },
+    {
+        "id": "inj57",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module8_inventory_total_products",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module8.inventory.total_products",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 1340,
+        "wires": [
+            [
+                "55c835dcd87e7fff"
+            ]
+        ]
+    },
+    {
+        "id": "inj58",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module8_inventory_today_in",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module8.inventory.today_in",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 1360,
+        "wires": [
+            [
+                "55c835dcd87e7fff"
+            ]
+        ]
+    },
+    {
+        "id": "inj59",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module8_inventory_today_out",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module8.inventory.today_out",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 1380,
+        "wires": [
+            [
+                "55c835dcd87e7fff"
+            ]
+        ]
+    },
+    {
+        "id": "inj60",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module8_inventory_available_space",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module8.inventory.available_space",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 1400,
+        "wires": [
+            [
+                "55c835dcd87e7fff"
+            ]
+        ]
+    },
+    {
+        "id": "inj61",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module8_logistics_pending_orders",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module8.logistics.pending_orders",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 1420,
+        "wires": [
+            [
+                "55c835dcd87e7fff"
+            ]
+        ]
+    },
+    {
+        "id": "inj62",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module8_logistics_shipping_today",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module8.logistics.shipping_today",
+        "payload": "",
+        "payloadType": "date",
+        "x": 220,
+        "y": 1440,
+        "wires": [
+            [
+                "55c835dcd87e7fff"
+            ]
+        ]
+    },
+    {
+        "id": "inj63",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module8_logistics_location_A",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module8.logistics.location_A",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 1460,
+        "wires": [
+            [
+                "55c835dcd87e7fff"
+            ]
+        ]
+    },
+    {
+        "id": "inj64",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module8_logistics_location_B",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "topic": "ns=1;s=precast_line1.module8.logistics.location_B",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 1480,
+        "wires": [
+            [
+                "55c835dcd87e7fff"
+            ]
+        ]
+    },
+    {
+        "id": "inj65",
+        "type": "inject",
+        "z": "4ecf18f9db264ff0",
+        "name": "module8_logistics_location_C",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "",
+        "topic": "ns=1;s=precast_line1.module8.logistics.location_C",
+        "payload": "",
+        "payloadType": "date",
+        "x": 200,
+        "y": 1500,
+        "wires": [
+            [
+                "55c835dcd87e7fff"
+            ]
+        ]
+    },
+    {
+        "id": "9ee92af5be47d819",
+        "type": "OpcUa-Client",
+        "z": "4ecf18f9db264ff0",
+        "endpoint": "9ce077ca2aecb7b6",
+        "action": "read",
+        "deadbandtype": "None",
+        "deadbandvalue": 0,
+        "time": 5,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "useTransport": false,
+        "maxChunkCount": "",
+        "maxMessageSize": "",
+        "receiveBufferSize": "",
+        "sendBufferSize": "",
+        "setstatusandtime": false,
+        "keepsessionalive": false,
+        "name": "Read Concrete Variables 4",
+        "x": 580,
+        "y": 700,
+        "wires": [
+            [
+                "a5eabc6d20309e69"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "a5eabc6d20309e69",
+        "type": "debug",
+        "z": "4ecf18f9db264ff0",
+        "name": "OPC UA Read Output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 800,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "e569af2ee32b966f",
+        "type": "OpcUa-Client",
+        "z": "4ecf18f9db264ff0",
+        "endpoint": "9ce077ca2aecb7b6",
+        "action": "read",
+        "deadbandtype": "None",
+        "deadbandvalue": 0,
+        "time": 5,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "useTransport": false,
+        "maxChunkCount": "",
+        "maxMessageSize": "",
+        "receiveBufferSize": "",
+        "sendBufferSize": "",
+        "setstatusandtime": false,
+        "keepsessionalive": false,
+        "name": "Read Concrete Variables 5",
+        "x": 580,
+        "y": 880,
+        "wires": [
+            [
+                "166b199231802a05"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "166b199231802a05",
+        "type": "debug",
+        "z": "4ecf18f9db264ff0",
+        "name": "OPC UA Read Output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 800,
+        "y": 880,
+        "wires": []
+    },
+    {
+        "id": "f47108d300a2aebf",
+        "type": "OpcUa-Client",
+        "z": "4ecf18f9db264ff0",
+        "endpoint": "9ce077ca2aecb7b6",
+        "action": "read",
+        "deadbandtype": "None",
+        "deadbandvalue": 0,
+        "time": 5,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "useTransport": false,
+        "maxChunkCount": "",
+        "maxMessageSize": "",
+        "receiveBufferSize": "",
+        "sendBufferSize": "",
+        "setstatusandtime": false,
+        "keepsessionalive": false,
+        "name": "Read Concrete Variables 6",
+        "x": 580,
+        "y": 1060,
+        "wires": [
+            [
+                "b8a312a36e5230bb"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "b8a312a36e5230bb",
+        "type": "debug",
+        "z": "4ecf18f9db264ff0",
+        "name": "OPC UA Read Output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 800,
+        "y": 1060,
+        "wires": []
+    },
+    {
+        "id": "37aa844aed60f44a",
+        "type": "OpcUa-Client",
+        "z": "4ecf18f9db264ff0",
+        "endpoint": "9ce077ca2aecb7b6",
+        "action": "read",
+        "deadbandtype": "None",
+        "deadbandvalue": 0,
+        "time": 5,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "useTransport": false,
+        "maxChunkCount": "",
+        "maxMessageSize": "",
+        "receiveBufferSize": "",
+        "sendBufferSize": "",
+        "setstatusandtime": false,
+        "keepsessionalive": false,
+        "name": "Read Concrete Variables 7",
+        "x": 580,
+        "y": 1220,
+        "wires": [
+            [
+                "2bbbf0ea6eb38b9f"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "2bbbf0ea6eb38b9f",
+        "type": "debug",
+        "z": "4ecf18f9db264ff0",
+        "name": "OPC UA Read Output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 800,
+        "y": 1220,
+        "wires": []
+    },
+    {
+        "id": "55c835dcd87e7fff",
+        "type": "OpcUa-Client",
+        "z": "4ecf18f9db264ff0",
+        "endpoint": "9ce077ca2aecb7b6",
+        "action": "read",
+        "deadbandtype": "None",
+        "deadbandvalue": 0,
+        "time": 5,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "useTransport": false,
+        "maxChunkCount": "",
+        "maxMessageSize": "",
+        "receiveBufferSize": "",
+        "sendBufferSize": "",
+        "setstatusandtime": false,
+        "keepsessionalive": false,
+        "name": "Read Concrete Variables 8",
+        "x": 580,
+        "y": 1440,
+        "wires": [
+            [
+                "637466c67664ce17"
+            ],
+            [],
+            []
+        ]
+    },
+    {
+        "id": "637466c67664ce17",
+        "type": "debug",
+        "z": "4ecf18f9db264ff0",
+        "name": "OPC UA Read Output",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 800,
+        "y": 1440,
+        "wires": []
+    },
+    {
+        "id": "9ce077ca2aecb7b6",
+        "type": "OpcUa-Endpoint",
+        "endpoint": "opc.tcp://127.0.0.1:4842",
+        "secpol": "None",
+        "secmode": "None",
+        "none": true,
+        "login": false,
+        "usercert": false,
+        "usercertificate": "",
+        "userprivatekey": ""
+    }
+]
